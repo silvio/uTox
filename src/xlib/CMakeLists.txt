@@ -49,7 +49,19 @@ message("X library: ${X11_LIBRARIES}")
 message("Xrender include: ${X11_Xrender_INCLUDE_PATH}")
 message("Xrender library: ${X11_Xrender_LIB}")
 
-target_link_libraries(utoxNATIVE icon v4lconvert ${X11_LIBRARIES} ${X11_Xrender_LIB} fontconfig ${FREETYPE_LIBRARIES} resolv dl )
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    include(FindPkgConfig)
+    pkg_check_modules(FONTCONFIG REQUIRED fontconfig)
+    pkg_check_modules(LIBV4CONVERT REQUIRED libv4lconvert)
+
+    set(LIB_FONTCONFIG ${FONTCONFIG_LIBRARIES})
+    set(LIB_V4LCONVERT ${LIBV4CONVERT_LIBRARIES})
+else()
+    set(LIB_FONTCONFIG libfontconfig)
+    set(LIB_V4LCONVERT v4lconvert)
+endif()
+
+target_link_libraries(utoxNATIVE icon ${LIB_V4LCONVERT} ${X11_LIBRARIES} ${X11_Xrender_LIB} ${LIB_FONTCONFIG} ${FREETYPE_LIBRARIES} resolv dl )
 
 include(GNUInstallDirs)
 

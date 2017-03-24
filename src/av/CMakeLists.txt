@@ -15,6 +15,24 @@ else()
     target_link_libraries(utoxAV opus)
 endif()
 
-if(FILTER_AUDIO)
-    target_link_libraries(utoxAV filteraudio)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    include(FindPkgConfig)
+    pkg_check_modules(LIBTOXAV REQUIRED libtoxav)
+    pkg_check_modules(OPENAL REQUIRED openal)
+    pkg_check_modules(FILTERAUDIO REQUIRED filteraudio)
+
+    include_directories(
+        ${LIBTOXAV_INCLUDEDIR}
+        ${OPENAL_INCLUDEDIR}
+        ${FILTERAUDIO_INCLUDEDIR}
+    )
+    set(LIB_FILTERAUDIO ${FILTERAUDIO_LIBRARIES})
+else()
+    set(LIB_FILTERAUDIO filteraudio)
+    set(FILTERAUDIO_FOUND 1)
+endif()
+
+if(FILTERAUDIO_FOUND)
+    target_link_libraries(utoxAV ${LIB_FILTERAUDIO})
 endif()
