@@ -127,6 +127,18 @@ endif()
 # https://gcc.gnu.org/gcc-4.8/changes.html
 # https://github.com/google/sanitizers/wiki/AddressSanitizer
 option(ENABLE_ASAN "Enable Address Sanitizer on debug builds" ON)
+option(MUSL_ASAN_OVERRIDE "Enable Address Sanitizer in conjunction with musl" OFF)
+
+if(CMAKE_C_IMPLICIT_LINK_DIRECTORIES MATCHES ".*musl.*")
+    message("It seems you are using musl. ASAN disabled")
+    set(TEMP_ASAN "${ENABLE_ASAN}")
+    set(ENABLE_ASAN OFF)
+    if(MUSL_ASAN_OVERRIDE)
+        message("force enable ASAN")
+        set(ENABLE_ASAN ${TEMP_ASAN})
+    endif()
+endif()
+
 if (ENABLE_ASAN)
     message("")
     message("  TIP: You may want to set the env variable  ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer  for ASAN to show nicer stack traces.")
